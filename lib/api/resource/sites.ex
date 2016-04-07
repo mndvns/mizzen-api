@@ -87,12 +87,12 @@ defmodule Api.Resource.Sites do
       |> ^Map.merge(
       if site do
         %{"collection" => [
-          link_to(Api.Sites.Malc0de, nil, input),
-          link_to(Api.Sites.McAfee, nil, input),
-          link_to(Api.Sites.RepAuth, nil, input),
-          link_to(Api.Sites.SafeBrowsing, nil, input),
-          link_to(Api.Sites.SenderBase, nil, input),
           link_to(Api.Sites.VirusTotal, nil, input),
+          link_to(Api.Sites.SenderBase, nil, input),
+          link_to(Api.Sites.McAfee, nil, input),
+          link_to(Api.Sites.SafeBrowsing, nil, input),
+          link_to(Api.Sites.RepAuth, nil, input),
+          link_to(Api.Sites.Malc0de, nil, input),
         ]}
       else
         %{}
