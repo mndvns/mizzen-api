@@ -90,7 +90,7 @@ defmodule Site do
   def safe_browsing(site, base) do
     uri = Request.uri(base <> "/lookup", %{
       "client" => "api",
-      "apikey" => @safe_browsing_key,
+      "apikey" => "ABQIAAAAzO0BeNsWxWi86s2xUZQ1ABTOCj0UZiK_d404jrg3TrlhPfcfBQ",
       "appver" => "1.0",
       "pver" => "3.0",
       "url" => site
