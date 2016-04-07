@@ -5,11 +5,12 @@ defmodule Site do
   require IEx
 
   @safe_browsing_key Application.get_env(:api, :safe_browsing_key)
-  @virus_total_key Application.get_env(:api, :virus_total_key)
+  # @virus_total_key Application.get_env(:api, :virus_total_key)
+  @virus_total_key "5e4581b65bb6d42055f3e1924813b498a5f94366ad1267eaf23c7f10eaa07471"
 
   def malc0de(site, base) do
-    wrap(site, base, fn([get: get, post: _post]) ->
-      get.("/database/index.php", %{"search" => site})
+    wrap("malc0de", site, base, fn(conf) ->
+      conf.get.("/database/index.php", %{"search" => site})
       |> Transform.clean(remove_tags: ["script", "style"], remove_attrs: [~r/^on-/, "href", "style"])
       |> Transform.to_html
       |> Transform.map(fn(x) ->
@@ -28,8 +29,8 @@ defmodule Site do
   end
 
   def mc_afee(site, base) do
-    wrap(site, base, fn([get: get, post: _post]) ->
-      get.("/threat-intelligence/domain/default.aspx", %{"domain" => site})
+    wrap("mc_afee", site, base, fn(conf) ->
+      conf.get.("/threat-intelligence/domain/default.aspx", %{"domain" => site})
       |> Transform.clean(remove_tags: ["script", "style"], remove_attrs: [~r/^on/, "src", "href", "style"])
       |> Transform.to_html
       |> Transform.map(fn(x) ->
@@ -43,8 +44,8 @@ defmodule Site do
   end
 
   def rep_auth(site, base) do
-    wrap(site, base, fn([get: get, post: _post]) ->
-      get.("/lookup.php", %{"ip" => site})
+    wrap("rep_auth", site, base, fn(conf) ->
+      conf.get.("/lookup.php", %{"ip" => site})
       |> Transform.clean(remove_tags: ["script", "style"], remove_attrs: [~r/^on-/, "href", "style"])
       |> Transform.to_html
       |> Transform.map(fn(x) ->
@@ -71,8 +72,8 @@ defmodule Site do
   end
 
   def safe_browsing(site, base) do
-    wrap(site, base, fn([get: get, post: post]) ->
-      body = get.("/lookup", %{
+    wrap("safe_browsing", site, base, fn(conf) ->
+      body = conf.get.("/lookup", %{
         "client" => "api",
         "apikey" => "ABQIAAAAzO0BeNsWxWi86s2xUZQ1ABTOCj0UZiK_d404jrg3TrlhPfcfBQ",
         "appver" => "1.0",
@@ -89,8 +90,8 @@ defmodule Site do
   end
 
   def sender_base(site, base) do
-    wrap(site, base, fn([get: get, post: _post])->
-      body = get.("/lookup/", %{"search_string" => site, "tos_accepted" => "Yes, I Agree"})
+    wrap("sender_base", site, base, fn(conf)->
+      body = conf.get.("/lookup/", %{"search_string" => site, "tos_accepted" => "Yes, I Agree"})
 
       {_, _, [string]} = Floki.find(body, "script")
       |> Enum.filter(fn({_tag, attrs, _children}) -> length(attrs) == 0 end)
@@ -115,61 +116,84 @@ defmodule Site do
         }
       end)
       |> Map.merge(%{
-        "geolocation" => get.("/api/location_for_ip/", %{"search_string" => site, "auth" => auth}),
-        "mail_server" => get.("/api/mail_servers/", %{"search_string" => site, "auth" => auth}),
+        "geolocation" => conf.get.("/api/location_for_ip/", %{"search_string" => site, "auth" => auth}),
+        "mail_server" => conf.get.("/api/mail_servers/", %{"search_string" => site, "auth" => auth}),
       })
     end)
   end
 
   def virus_total(site, base) do
-    wrap(site, base, fn([get: _get, post: post]) ->
-      post.("/report", {:form, [
-        {"resource", site},
-        {"apikey", "5e4581b65bb6d42055f3e1924813b498a5f94366ad1267eaf23c7f10eaa07471"},
-        {"scan", 1}
-      ]})
-    end, [use_store: fn(body) ->
-      body["verbose_msg"] == "Scan finished, scan information embedded in this object"
+    wrap("virus_total", site, base, fn(conf) ->
+      %{
+        "url" => conf.post.("/url/report", {:form, [
+          {"apikey", @virus_total_key},
+          {"resource", site},
+          {"scan", 1}
+        ]})
+      }
+      |> Map.merge(
+        if conf.is_ip do
+          %{
+            "ip" => conf.get.("/ip-address/report", %{
+              "apikey" => @virus_total_key,
+              "ip" => site,
+            })
+          }
+        else
+          %{}
+        end)
+    end, [use_store: fn(res) ->
+      if res["is_ip"] do
+        res["body"]["ip"]["verbose_msg"] == "IP address in dataset" &&
+        res["body"]["url"]["verbose_msg"] == "Scan finished, scan information embedded in this object"
+      else
+        res["body"]["url"]["verbose_msg"] == "Scan finished, scan information embedded in this object"
+      end
     end])
   end
 
-  defp wrap(site, base, func) do
-    wrap(site, base, func, [use_store: true])
+  defp wrap(name, site, base, func) do
+    wrap(name, site, base, func, [use_store: true])
   end
-  defp wrap(site, base, func, [use_store: use_store]) do
-    case ResponseStore.read(site, base) do
+  defp wrap(name, site, base, func, [use_store: use_store]) do
+    case ResponseStore.read(site, name) do
       {:ok, res} ->
         res
       _ ->
         {:ok, store} = RequestStore.new()
 
-      get = fn(path, query) ->
-        uri = Request.uri(base <> path, query, nil, nil, true)
-        RequestStore.add(store, %{"method" => "GET", "uri" => uri})
-        Request.get(uri)
-      end
+        get = fn(path, query) ->
+          uri = Request.uri(base <> path, query, nil, nil, true)
+          RequestStore.add(store, %{"method" => "GET", "uri" => uri})
+          Request.get(uri)
+        end
 
-      post = fn(path, body) ->
-        uri = Request.uri(base <> path, nil, nil, nil, true)
-        RequestStore.add(store, %{"method" => "POST", "uri" => uri})
-        Request.post(uri, body)
-      end
+        post = fn(path, body) ->
+          uri = Request.uri(base <> path, nil, nil, nil, true)
+          RequestStore.add(store, %{"method" => "POST", "uri" => uri})
+          Request.post(uri, body)
+        end
 
-      body = func.([get: get, post: post])
+        is_ip = Regex.match?(~r/^[\d*]\.[\d*]\.[\d*]\.[\d*]$/, site)
 
-      res = %{
-        "requests" => RequestStore.get(store),
-        "body" => body
-      }
+        body = func.(%{get: get, post: post, is_ip: is_ip})
 
-      cond do
-        is_boolean(use_store) && use_store ->
-          ResponseStore.write(site, base, res)
-        is_function(use_store) && use_store.(body) ->
-          ResponseStore.write(site, base, res)
-      end
+        res = %{
+          "body" => body,
+          "is_ip" => is_ip,
+          "requests" => RequestStore.get(store),
+        }
 
-      res
+        cond do
+          is_boolean(use_store) && use_store ->
+            ResponseStore.write(site, name, res)
+          is_function(use_store) && use_store.(res) ->
+            ResponseStore.write(site, name, res)
+          true ->
+            nil
+        end
+
+        res
     end
   end
 

@@ -22,7 +22,7 @@ defmodule Api.Sites.Mount do
       base: "http://www.senderbase.org"
 
       site name: "VirusTotal", display: "Virus Total", types: ["ip"],
-      base: "https://www.virustotal.com/vtapi/v2/url"
+      base: "https://www.virustotal.com/vtapi/v2"
     end
   end
 
@@ -50,7 +50,8 @@ defmodule Api.Sites.Mount do
                 "meta" => %{
                   "name" => unquote(display),
                   "types" => unquote(types),
-                  "requests" => res["requests"]
+                  "requests" => res["requests"],
+                  "is_ip" => res["is_ip"],
                 },
                 "body" => res["body"]
               }
