@@ -4,7 +4,7 @@ defmodule Site do
   require Request
   require IEx
 
-  @safe_browsing_key System.get_env() |> Map.get("SAFE_BROWSING_KEY")
+  @safe_browsing_key Application.get_env(:api, :safe_browsing_key)
 
   def malc0de(site, base) do
     uri = Request.uri(base <> "/database/index.php", %{"search" => site})
