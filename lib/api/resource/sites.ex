@@ -43,18 +43,26 @@ defmodule Api.Sites.Mount do
 
           let site = Input.get("site")
           let res = apply(Site, unquote(underscore), [site, unquote(base)])
+          let meta do
+            %{
+              "name" => unquote(display),
+              "types" => unquote(types),
+            }
+          end
 
           hyper do
             action do
               %{
-                "meta" => %{
-                  "name" => unquote(display),
-                  "types" => unquote(types),
+                "meta" => meta |> ^Map.merge(%{
                   "requests" => res["requests"],
                   "is_ip" => res["is_ip"],
-                },
+                }),
                 "body" => res["body"]
               }
+            end
+
+            affordance do
+              meta
             end
           end
         end

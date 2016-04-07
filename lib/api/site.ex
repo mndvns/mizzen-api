@@ -100,6 +100,12 @@ defmodule Site do
 
       [_ | [auth]] = Regex.run(~r/authHash\s?=\s?["'](.*)["']/, string)
 
+      site_host = if conf.is_ip do
+        site
+      else
+        URI.parse(site) |> Map.get(:host)
+      end
+
       body
       |> Transform.clean(remove_tags: ["script"], remove_attrs: [~r/^on+/, ~r/href/])
       |> Transform.to_html
@@ -116,8 +122,12 @@ defmodule Site do
         }
       end)
       |> Map.merge(%{
-        "geolocation" => conf.get.("/api/location_for_ip/", %{"search_string" => site, "auth" => auth}),
-        "mail_server" => conf.get.("/api/mail_servers/", %{"search_string" => site, "auth" => auth}),
+        "geolocation" => if conf.is_ip do
+          conf.get.("/api/location_for_ip/", %{"search_string" => site, "auth" => auth})
+        else
+          nil
+        end,
+        "mail_server" => conf.get.("/api/mail_servers/", %{"search_string" => site_host, "auth" => auth}),
       })
     end)
   end
