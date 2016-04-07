@@ -93,12 +93,17 @@ defmodule Site do
     wrap("sender_base", site, base, fn(conf)->
       body = conf.get.("/lookup/", %{"search_string" => site, "tos_accepted" => "Yes, I Agree"})
 
-      {_, _, [string]} = Floki.find(body, "script")
-      |> Enum.filter(fn({_tag, attrs, _children}) -> length(attrs) == 0 end)
-      |> Enum.filter(fn({_tag, _attrs, [firstLine | _]}) -> String.contains?(firstLine, "authHash") end)
-      |> hd
+      # TODO fix this crap
+      auth = if conf.is_ip do
+        [{_, _, [string]} | _] = Floki.find(body, "script")
+        |> Enum.filter(fn({_tag, attrs, _children}) -> length(attrs) == 0 end)
+        |> Enum.filter(fn({_tag, _attrs, [firstLine | _]}) -> String.contains?(firstLine, "authHash") end)
 
-      [_ | [auth]] = Regex.run(~r/authHash\s?=\s?["'](.*)["']/, string)
+        [_ | [auth]] = Regex.run(~r/authHash\s?=\s?["'](.*)["']/, string)
+        auth
+      else
+        ""
+      end
 
       site_host = if conf.is_ip do
         site
@@ -127,7 +132,11 @@ defmodule Site do
         else
           nil
         end,
-        "mail_server" => conf.get.("/api/mail_servers/", %{"search_string" => site_host, "auth" => auth}),
+        "mail_server" => if conf.is_ip do
+          conf.get.("/api/mail_servers/", %{"search_string" => site_host, "auth" => auth})
+        else
+          nil
+        end
       })
     end)
   end
