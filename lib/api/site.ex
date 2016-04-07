@@ -125,16 +125,18 @@ defmodule Site do
     wrap(site, base, fn([get: _get, post: post]) ->
       post.("/report", {:form, [
         {"resource", site},
-        {"apikey", @virus_total_key},
+        {"apikey", "5e4581b65bb6d42055f3e1924813b498a5f94366ad1267eaf23c7f10eaa07471"},
         {"scan", 1}
       ]})
-    end, [bypass_store: true])
+    end, [use_store: fn(body) ->
+      body["verbose_msg"] == "Scan finished, scan information embedded in this object"
+    end])
   end
 
   defp wrap(site, base, func) do
-    wrap(site, base, func, [bypass_store: false])
+    wrap(site, base, func, [use_store: true])
   end
-  defp wrap(site, base, func, [bypass_store: bypass_store]) do
+  defp wrap(site, base, func, [use_store: use_store]) do
     case ResponseStore.read(site, base) do
       {:ok, res} ->
         res
@@ -160,8 +162,11 @@ defmodule Site do
         "body" => body
       }
 
-      if !bypass_store do
-        ResponseStore.write(site, base, res)
+      cond do
+        is_boolean(use_store) && use_store ->
+          ResponseStore.write(site, base, res)
+        is_function(use_store) && use_store.(body) ->
+          ResponseStore.write(site, base, res)
       end
 
       res
