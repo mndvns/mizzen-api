@@ -10,4 +10,5 @@ defmodule Api.HTTP do
   get  "/sites/rep_auth",      Api.Sites.RepAuth
   get  "/sites/safe_browsing", Api.Sites.SafeBrowsing
   get  "/sites/sender_base",   Api.Sites.SenderBase
+  get  "/sites/virus_total",   Api.Sites.VirusTotal
 end

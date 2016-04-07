@@ -2,9 +2,30 @@ defmodule Request do
   require HTTPoison
   require Logger
 
+  def post(url, data) do
+    post(url, nil, data)
+  end
+  def post(url, query, data) do
+    %HTTPoison.Response{body: body} = HTTPoison.post!(uri(url, query, "POST"), data)
+    body |> Poison.decode!
+  end
+
   def get(url, query \\ nil) do
-    %HTTPoison.Response{body: body} = HTTPoison.get!(uri(url, query))
-    body
+    get(url, query, [json: true])
+  end
+  def get(url, query, [json: json]) do
+    %HTTPoison.Response{body: body} = HTTPoison.get!(uri(url, query, "GET"))
+
+    if json do
+      case body |> Poison.decode do
+        {:ok, json} ->
+          json
+        _ ->
+          body
+      end
+    else
+      body
+    end
   end
 
   def get_json(url, query \\ nil) do
@@ -17,9 +38,14 @@ defmodule Request do
     end
   end
 
-  def uri(url, query \\ nil) do
+  def uri(url, query \\ nil, method \\ "GET", data \\ nil, silent \\ false) do
     uri = url <> query_encode(query)
-    Logger.info("GET #{uri}")
+    if !silent do
+      Logger.info("#{method} #{uri}")
+      if not is_nil(data) do
+        IO.inspect data
+      end
+    end
     uri
   end
 

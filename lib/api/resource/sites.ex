@@ -20,6 +20,9 @@ defmodule Api.Sites.Mount do
 
       site name: "SenderBase", display: "SenderBase", types: ["ip"],
       base: "http://www.senderbase.org"
+
+      site name: "VirusTotal", display: "Virus Total", types: ["ip"],
+      base: "https://www.virustotal.com/vtapi/v2/url"
     end
   end
 
@@ -39,21 +42,20 @@ defmodule Api.Sites.Mount do
           use PoeApi.Resource
 
           let site = Input.get("site")
-          let service = apply(Site, unquote(underscore), [site, unquote(base)])
+          let res = apply(Site, unquote(underscore), [site, unquote(base)])
 
           hyper do
             action do
               %{
-                "name" => unquote(display),
-                "types" => unquote(types),
-                "body" => service
+                "meta" => %{
+                  "name" => unquote(display),
+                  "types" => unquote(types),
+                  "requests" => res["requests"]
+                },
+                "body" => res["body"]
               }
             end
           end
-
-          # def get(url, query \\ nil) do
-          #   Request.get(base <> url, query)
-          # end
         end
 
       Module.create(unquote(mod), contents, Macro.Env.location(__ENV__))
@@ -81,6 +83,7 @@ defmodule Api.Resource.Sites do
           link_to(Api.Sites.RepAuth, nil, input),
           link_to(Api.Sites.SafeBrowsing, nil, input),
           link_to(Api.Sites.SenderBase, nil, input),
+          link_to(Api.Sites.VirusTotal, nil, input),
         ]}
       else
         %{}
