@@ -10,7 +10,7 @@ defmodule Site do
 
   def malc0de(site, base) do
     wrap("malc0de", site, base, fn(conf) ->
-      conf.get.("/database/index.php", %{"search" => site})
+      conf.get.("/database/index.php", %{"search" => conf.site})
       |> Transform.clean(remove_tags: ["script", "style"], remove_attrs: [~r/^on-/, "href", "style"])
       |> Transform.to_html
       |> Transform.map(fn(x) ->
@@ -30,7 +30,7 @@ defmodule Site do
 
   def mc_afee(site, base) do
     wrap("mc_afee", site, base, fn(conf) ->
-      conf.get.("/threat-intelligence/domain/default.aspx", %{"domain" => site})
+      conf.get.("/threat-intelligence/domain/default.aspx", %{"domain" => conf.site})
       |> Transform.clean(remove_tags: ["script", "style"], remove_attrs: [~r/^on/, "src", "href", "style"])
       |> Transform.to_html
       |> Transform.map(fn(x) ->
@@ -45,7 +45,13 @@ defmodule Site do
 
   def rep_auth(site, base) do
     wrap("rep_auth", site, base, fn(conf) ->
-      conf.get.("/lookup.php", %{"ip" => site})
+      path = if conf.is_ip do
+        "/lookup.php"
+      else
+        "/domain_lookup.php"
+      end
+
+      conf.get.(path, %{"ip" => site})
       |> Transform.clean(remove_tags: ["script", "style"], remove_attrs: [~r/^on-/, "href", "style"])
       |> Transform.to_html
       |> Transform.map(fn(x) ->
@@ -78,7 +84,7 @@ defmodule Site do
         "apikey" => "ABQIAAAAzO0BeNsWxWi86s2xUZQ1ABTOCj0UZiK_d404jrg3TrlhPfcfBQ",
         "appver" => "1.0",
         "pver" => "3.0",
-        "url" => site
+        "url" => conf.site
       })
 
       %{
@@ -91,7 +97,7 @@ defmodule Site do
 
   def sender_base(site, base) do
     output = wrap("sender_base", site, base, fn(conf)->
-      body = conf.get.("/lookup/", %{"search_string" => site, "tos_accepted" => "Yes, I Agree"})
+      body = conf.get.("/lookup/", %{"search_string" => conf.site, "tos_accepted" => "Yes, I Agree"})
 
       # TODO fix this crap
       auth = if conf.is_ip do
@@ -106,9 +112,9 @@ defmodule Site do
       end
 
       site_host = if conf.is_ip do
-        site
+        conf.site
       else
-        URI.parse(site) |> Map.get(:host)
+        URI.parse(conf.site) |> Map.get(:host)
       end
 
       body
@@ -128,7 +134,7 @@ defmodule Site do
       end)
       |> Map.merge(%{
         "geolocation" => if conf.is_ip do
-          conf.get.("/api/location_for_ip/", %{"search_string" => site, "auth" => auth})
+          conf.get.("/api/location_for_ip/", %{"search_string" => conf.site, "auth" => auth})
         else
           nil
         end,
@@ -150,7 +156,7 @@ defmodule Site do
       output = %{
         "url" => conf.post.("/url/report", {:form, [
           {"apikey", @virus_total_key},
-          {"resource", site},
+          {"resource", conf.site},
           {"scan", 1}
         ]})
       }
@@ -159,7 +165,7 @@ defmodule Site do
           %{
             "ip" => conf.get.("/ip-address/report", %{
               "apikey" => @virus_total_key,
-              "ip" => site,
+              "ip" => conf.site,
             })
           }
         else
@@ -192,6 +198,14 @@ defmodule Site do
       _ ->
         {:ok, store} = RequestStore.new()
 
+        is_ip = Regex.match?(~r/^[\d*]\.[\d*]\.[\d*]\.[\d*]$/, site)
+
+        site = if !is_ip do
+          "http://ip-api.com/json/#{site}"
+          |> Request.get
+          |> Map.get("query", nil)
+        end
+
         get = fn(path, query) ->
           uri = Request.uri(base <> path, query, nil, nil, true)
           RequestStore.add(store, %{"method" => "GET", "uri" => uri})
@@ -204,14 +218,11 @@ defmodule Site do
           Request.post(uri, body)
         end
 
-        is_ip = Regex.match?(~r/^[\d*]\.[\d*]\.[\d*]\.[\d*]$/, site)
-
-        body = func.(%{get: get, post: post, is_ip: is_ip})
+        body = func.(%{get: get, post: post, is_ip: is_ip, site: site})
 
         res = %{
           "body" => body,
           "is_ip" => is_ip,
-          # "is_bad" => is_bad,
           "requests" => RequestStore.get(store),
         }
 
