@@ -90,7 +90,7 @@ defmodule Site do
   end
 
   def sender_base(site, base) do
-    wrap("sender_base", site, base, fn(conf)->
+    output = wrap("sender_base", site, base, fn(conf)->
       body = conf.get.("/lookup/", %{"search_string" => site, "tos_accepted" => "Yes, I Agree"})
 
       # TODO fix this crap
@@ -139,11 +139,15 @@ defmodule Site do
         end
       })
     end)
+
+    bad? = get_in(output, ["body", "web_reputation"]) != "Neutral"
+
+    output |>  Map.put("is_bad", bad?)
   end
 
   def virus_total(site, base) do
     wrap("virus_total", site, base, fn(conf) ->
-      %{
+      output = %{
         "url" => conf.post.("/url/report", {:form, [
           {"apikey", @virus_total_key},
           {"resource", site},
@@ -160,8 +164,15 @@ defmodule Site do
           }
         else
           %{}
-        end)
+        end
+      )
+
+      bad? = get_in(output, ["body", "url", "positives"]) == 0
+
+      output |>  Map.put("is_bad", bad?)
+
     end, [use_store: fn(res) ->
+
       if res["is_ip"] do
         res["body"]["ip"]["verbose_msg"] == "IP address in dataset" &&
         res["body"]["url"]["verbose_msg"] == "Scan finished, scan information embedded in this object"
@@ -200,6 +211,7 @@ defmodule Site do
         res = %{
           "body" => body,
           "is_ip" => is_ip,
+          # "is_bad" => is_bad,
           "requests" => RequestStore.get(store),
         }
 
@@ -211,8 +223,6 @@ defmodule Site do
           true ->
             nil
         end
-
-        res
     end
   end
 

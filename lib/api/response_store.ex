@@ -19,9 +19,11 @@ defmodule ResponseStore do
   end
 
   def write(site, name, data) do
-    File.open(path(site, name), [:write], fn(file) ->
-      IO.binwrite(file, Poison.encode_to_iodata!(data))
-    end)
+
+    data
+    # File.open(path(site, name), [:write], fn(file) ->
+    #   IO.binwrite(file, Poison.encode_to_iodata!(data))
+    # end)
   end
 
   defp path(site, name) do

@@ -55,8 +55,9 @@ defmodule Api.Sites.Mount do
               %{
                 "meta" => meta |> ^Map.merge(%{
                   "requests" => res["requests"],
-                  "is_ip" => res["is_ip"],
+                  "is_ip" => res["is_ip"]
                 }),
+                "is_bad" => res["is_bad"],
                 "body" => res["body"]
               }
             end
