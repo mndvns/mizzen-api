@@ -1,5 +1,5 @@
 defmodule Api.VirusTotal.Client do
-  @key Application.get_env(:api, "5e4581b65bb6d42055f3e1924813b498a5f94366ad1267eaf23c7f10eaa07471")
+  @key "5e4581b65bb6d42055f3e1924813b498a5f94366ad1267eaf23c7f10eaa07471"
 
   def file_scan(file) do
     url
