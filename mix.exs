@@ -13,18 +13,24 @@ defmodule Api.Mixfile do
 
   def application do
     [applications: [
+        :con_cache,
         :logger,
         :poe_api,
-        :simple_env],
+        :simple_env,
+        :virus_total],
      mod: { Api, [] },]
   end
 
   defp deps do
-    [{ :poe_api, github: "poegroup/poe-api" },
-     { :html_entities, "~> 0.3" },
-     { :httpoison, "~> 0.8.0" },
-     { :simple_env, github: "camshaft/simple_env" },
-     { :sweet_xml, "~> 0.6.1" },
-     { :floki, "~> 0.8.0" }]
+    [
+      {:con_cache, "~> 0.11.1"},
+      {:floki, "~> 0.8.0" },
+      {:html_entities, "~> 0.3" },
+      {:httpoison, "~> 0.8.0" },
+      {:poe_api, github: "poegroup/poe-api" },
+      {:simple_env, github: "camshaft/simple_env" },
+      {:sweet_xml, "~> 0.6.1" },
+      {:virus_total, "~> 0.0.1"},
+    ]
   end
 end

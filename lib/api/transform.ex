@@ -6,7 +6,7 @@ defmodule Transform do
 
   def map(html, func) do
     xpath_func = fn(string, opts) ->
-      SweetXml.xpath(html, SweetXml.sigil_x(to_string(string), to_char_list(opts)))
+      SweetXml.xpath(html, SweetXml.sigil_x(to_string(string), to_charlist(opts)))
     end
 
     func.(xpath_func)

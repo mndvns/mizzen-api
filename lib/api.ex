@@ -1,5 +1,10 @@
 defmodule Api do
+  @vendors Application.get_env(:api, :vendors)
+
   use Application
+
+  def vendors, do: @vendors
+  def vendors(name), do: @vendors[name]
 
   def start(_type, _args) do
     Mix.env == :dev && PoeApi.Dev.start()
@@ -13,11 +18,19 @@ defmodule Api do
     import Elixir.Supervisor.Spec
 
     def start_link() do
-      {:ok, _sup} = Elixir.Supervisor.start_link(__MODULE__, [], name: :supervisor)
+      Elixir.Supervisor.start_link(__MODULE__, [], name: :supervisor)
     end
 
-    def init(_opts) do
-      {:ok, {{:one_for_one, 10, 10}, []}}
+    defp cache([{:name, name} | _] = opts) do
+      worker(ConCache, [[], opts], [id: name])
+    end
+
+    def init([]) do
+      children = for {key, value} <- Api.vendors do
+        cache(name: key, ttl: Map.get(value, :ttl, :timer.minutes(5)))
+      end
+
+      supervise(children, strategy: :one_for_one)
     end
   end
 end

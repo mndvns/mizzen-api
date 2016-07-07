@@ -6,25 +6,34 @@ defmodule Request do
     post(url, nil, data)
   end
   def post(url, query, data) do
-    %HTTPoison.Response{body: body} = HTTPoison.post!(uri(url, query, "POST"), data, timeout: 12000, recv_timeout: 12000)
+    %HTTPoison.Response{body: body} = HTTPoison.post!(url, data, timeout: 12000, recv_timeout: 12000)
     body |> Poison.decode!
   end
 
-  def get(url, query \\ nil) do
-    get(url, query, [json: true])
-  end
-  def get(url, query, [json: json]) do
-    %HTTPoison.Response{body: body} = HTTPoison.get!(uri(url, query, "GET"), [], timeout: 12000, recv_timeout: 12000)
+  def get(url, query \\ %{}, cookies \\ []) do
+    cookie = Enum.reduce(cookies, "", fn({k, v}, acc) ->
+      acc <> k <> "=" <> to_string(v) <> "; "
+    end)
+    |> String.trim
 
-    if json do
-      case body |> Poison.decode do
-        {:ok, json} ->
-          json
-        _ ->
-          body
-      end
+    opts = [
+      timeout: 12000,
+      recv_timeout: 12000
+    ]
+
+    opts = if String.length(cookie) > 0 do
+      opts ++ [hackney: [cookie: [cookie]]]
     else
-      body
+      opts
+    end
+
+    %HTTPoison.Response{body: body} = HTTPoison.get!(uri(url, query), %{}, opts)
+
+    case body |> Poison.decode do
+      {:ok, json} ->
+        json
+      _ ->
+        body
     end
   end
 

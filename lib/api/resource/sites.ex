@@ -3,42 +3,27 @@ end
 
 defmodule Api.Sites.Mount do
   defmacro __using__(_) do
-    quote do
+    vendors = Api.vendors |> Map.values
+    [quote do
       import unquote(__MODULE__)
-
-      site name: "Malc0de", display: "malc0de", types: ["ip", "hostname", "md5"],
-      base: "http://malc0de.com"
-
-      site name: "McAfee", display: "McAfee", types: ["hostname"],
-      base: "http://www.mcafee.com"
-
-      site name: "RepAuth", display: "Reputation Authority", types: ["ip"],
-      base: "http://www.reputationauthority.org"
-
-      site name: "SafeBrowsing", display: "Safe Browsing", types: ["hostname"],
-      base: "https://sb-ssl.google.com/safebrowsing/api"
-
-      site name: "SenderBase", display: "SenderBase", types: ["ip"],
-      base: "http://www.senderbase.org"
-
-      site name: "VirusTotal", display: "Virus Total", types: ["ip"],
-      base: "https://www.virustotal.com/vtapi/v2"
+    end] ++ for vendor <- vendors do
+      quote do
+        site unquote(vendor)
+      end
     end
   end
 
-  defmacro site([name: name, display: display, types: types, base: base]) do
+  defmacro site(%{base: base, display: display, name: name, types: types}) do
     mod = Module.concat([Api, Sites, name])
     underscore = String.to_atom(Mix.Utils.underscore(name))
 
     quote do
       base = unquote(base)
       display = unquote(display)
-      types = unquote(types)
       underscore = unquote(underscore)
 
       contents =
         quote do
-          require Request
           use PoeApi.Resource
 
           let site = Input.get("site")
@@ -46,7 +31,6 @@ defmodule Api.Sites.Mount do
           let meta do
             %{
               "name" => unquote(display),
-              "types" => unquote(types),
             }
           end
 
@@ -54,10 +38,9 @@ defmodule Api.Sites.Mount do
             action do
               %{
                 "meta" => meta |> ^Map.merge(%{
-                  "requests" => res["requests"],
-                  "is_ip" => res["is_ip"]
+                  "is_ip" => res["is_ip"],
+                  "is_domain" => res["is_domain"]
                 }),
-                "is_bad" => res["is_bad"],
                 "body" => res["body"]
               }
             end
@@ -90,8 +73,8 @@ defmodule Api.Resource.Sites do
         %{"collection" => [
           link_to(Api.Sites.VirusTotal, nil, input),
           link_to(Api.Sites.SenderBase, nil, input),
-          link_to(Api.Sites.McAfee, nil, input),
-          link_to(Api.Sites.SafeBrowsing, nil, input),
+          # link_to(Api.Sites.McAfee, nil, input),
+          # link_to(Api.Sites.SafeBrowsing, nil, input),
           link_to(Api.Sites.RepAuth, nil, input),
           link_to(Api.Sites.Malc0de, nil, input),
         ]}
