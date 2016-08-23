@@ -1,6 +1,10 @@
 defmodule Api.HTTP do
   use PoeApi.HTTP
 
+  require IEx
+
+  IEx.pry
+
   get  "/",                    Api.Resource.Root
   get  "/sites",               Api.Resource.Sites
   post "/sites",               Api.Resource.Sites.Fetch
@@ -11,4 +15,5 @@ defmodule Api.HTTP do
   get  "/sites/safe_browsing", Api.Sites.SafeBrowsing
   get  "/sites/sender_base",   Api.Sites.SenderBase
   get  "/sites/virus_total",   Api.Sites.VirusTotal
+  get  "/sites/threat_web",    Api.Sites.ThreatWeb
 end

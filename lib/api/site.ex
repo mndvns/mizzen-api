@@ -38,7 +38,6 @@ defmodule Site.Helper do
       end
     end
   end
-
 end
 
 defmodule Site do
