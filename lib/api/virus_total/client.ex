@@ -1,5 +1,5 @@
 defmodule Api.VirusTotal.Client do
-  @key Application.get_env(:api, :threat_web_key)
+  @key Application.get_env(:api, :virus_total_key)
 
   def file_scan(file) do
     url
