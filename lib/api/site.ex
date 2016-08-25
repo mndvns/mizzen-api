@@ -12,11 +12,21 @@ defmodule Site.Helper do
 
     quote do
       def unquote(name)(site, base) do
-        ConCache.get_or_store(unquote(name), site, fn ->
-          wrap(site, base, fn(conf) ->
+        # ConCache.get_or_store(unquote(name), site, fn ->
+        IO.inspect BEFORE_WRAP_SITE: site
+        IO.inspect BEFORE_WRAP_BASE: base
+        wrap(site, base, fn(conf) ->
+          if String.contains?(base, "threatweb") do
+            IO.inspect WRAP_CONF: conf
+            # conf.get()
+            conf.get.("", %{"q" => site, "apikey" => "d29b598b-81fd-4628-8ad4-086678ae12cd"}, [])
+            # (unquote(fun)).(site, conf)
+            # IEx.pry(binding, __ENV__, 5000)
+          else
             (unquote(fun)).(site, conf)
-          end)
+          end
         end)
+        # end)
       end
     end
   end
@@ -32,9 +42,9 @@ defmodule Site.Helper do
 
     quote do
       def unquote(name)(site, base \\ nil) do
-        ConCache.get_or_store(unquote(name), site, fn ->
-          (unquote(fun)).(site)
-        end)
+        (unquote(fun)).(site)
+        # ConCache.get_or_store(unquote(name), site, fn ->
+        # end)
       end
     end
   end
@@ -45,6 +55,8 @@ defmodule Site do
   require Floki
   require Request
 
+  require IEx
+
   @safe_browsing_key Application.get_env(:api, :safe_browsing_key)
 
   import Site.Helper
@@ -53,7 +65,14 @@ defmodule Site do
     Api.VirusTotal.scan(site)
   end
 
-  require IEx
+  defsite threat_web(site, conf) do
+    IO.inspect HERE: [site, conf]
+    IEx.pry
+    %{
+      "foo" => "bar"
+    }
+  end
+
   defsite sender_base(site, conf) do
     path = conf.resolve_ip_to_site.()
 
@@ -74,7 +93,7 @@ defmodule Site do
       URI.parse(conf.site) |> Map.get(:host, conf.site)
     end
 
-    body
+    output = body
     |> Transform.clean(remove_tags: ["script"], remove_attrs: [~r/^on+/, ~r/href/])
     |> Transform.to_html
     |> Transform.map(fn(x) ->
@@ -97,6 +116,14 @@ defmodule Site do
         conf.get.("/api/mail_servers/", %{"search_string" => site_host, "auth" => auth}, [])
       end
     })
+
+    IO.inspect [
+      SENDER_BASE_SITE: site,
+      SENDER_BASE_CONF: conf,
+      SENDER_BASE_OUTPUT: output
+    ]
+
+    output
   end
 
   defsite malc0de(site, conf) do
@@ -205,6 +232,12 @@ defmodule Site do
     }
 
     body = func.(map)
+
+    IO.inspect WRAP_SITE: site
+    IO.inspect WRAP_BASE: base
+    IO.inspect WRAP_FUNC: func
+    IO.inspect WRAP_BODY: body
+
 
     %{
       "is_ip" => is_ip,

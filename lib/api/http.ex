@@ -1,10 +1,6 @@
 defmodule Api.HTTP do
   use PoeApi.HTTP
 
-  require IEx
-
-  IEx.pry
-
   get  "/",                    Api.Resource.Root
   get  "/sites",               Api.Resource.Sites
   post "/sites",               Api.Resource.Sites.Fetch

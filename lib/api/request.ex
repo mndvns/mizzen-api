@@ -21,13 +21,31 @@ defmodule Request do
       recv_timeout: 12000
     ]
 
+    IO.inspect [
+      GET_URL: url,
+      GET_QUERY: query,
+      GET_COOKIES: cookies
+    ]
+
     opts = if String.length(cookie) > 0 do
       opts ++ [hackney: [cookie: [cookie]]]
     else
       opts
     end
 
-    %HTTPoison.Response{body: body} = HTTPoison.get!(uri(url, query), %{}, opts)
+    hackney_opts = [
+      ssl_options: [server_name_indication: :disable]
+    ]
+
+    req_url = uri(url, query)
+    req_headers = %{
+      "User-Agent" => "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36"
+    }
+
+    response = %HTTPoison.Response{body: body} = HTTPoison.get!(req_url, req_headers, [hackney: hackney_opts])
+
+    IO.inspect REQ_URL: req_url
+    IO.inspect REQ_RESPONSE: response
 
     case body |> Poison.decode do
       {:ok, json} ->
