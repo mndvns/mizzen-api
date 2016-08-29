@@ -45,7 +45,6 @@ defmodule Request do
     response = %HTTPoison.Response{body: body} = HTTPoison.get!(req_url, req_headers, [hackney: hackney_opts])
 
     IO.inspect REQ_URL: req_url
-    IO.inspect REQ_RESPONSE: response
 
     case body |> Poison.decode do
       {:ok, json} ->

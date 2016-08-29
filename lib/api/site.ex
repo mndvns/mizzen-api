@@ -32,8 +32,8 @@ defmodule Site.Helper do
 
     quote do
       def unquote(name)(site, base \\ nil) do
-        (unquote(fun)).(site)
         ConCache.get_or_store(unquote(name), site, fn ->
+          (unquote(fun)).(site)
         end)
       end
     end
@@ -44,10 +44,8 @@ defmodule Site do
   require Transform
   require Floki
   require Request
-  require ExJSON
 
-  require IEx
-
+  @threat_web_key Application.get_env(:api, :threat_web_key)
   @safe_browsing_key Application.get_env(:api, :safe_browsing_key)
 
   import Site.Helper
@@ -57,22 +55,11 @@ defmodule Site do
   end
 
   defsite threat_web(site, conf) do
-    twKey = Application.get_env(:api, :threat_web_key)
-    body = conf.get.("", %{"q" => site, "apikey" => twKey}, [])
-    body
-      |> format_threatweb_response()
-  end
-  defp format_threatweb_response(body) do
-    body
-      |> replace_newline
-      |> makeJsonArray
-      |> ExJSON.parse(:to_map)
-  end
-  defp replace_newline(body) do
-    Regex.replace(~r/\n/, body, ",")
-  end
-  defp makeJsonArray(body) do
-    "[" <> body <> "]"
+    conf.get.("", %{"q" => site, "apikey" => @threat_web_key}, [])
+    |> String.split("\n")
+    |> Stream.map(&Poison.decode!/1)
+    |> Enum.to_list()
+    |> List.wrap()
   end
 
   defsite sender_base(site, conf) do
@@ -118,12 +105,6 @@ defmodule Site do
         conf.get.("/api/mail_servers/", %{"search_string" => site_host, "auth" => auth}, [])
       end
     })
-
-    IO.inspect [
-      SENDER_BASE_SITE: site,
-      SENDER_BASE_CONF: conf,
-      SENDER_BASE_OUTPUT: output
-    ]
 
     output
   end
@@ -234,11 +215,6 @@ defmodule Site do
     }
 
     body = func.(map)
-
-    # IO.inspect WRAP_SITE: site
-    # IO.inspect WRAP_BASE: base
-    # IO.inspect WRAP_FUNC: func
-    # IO.inspect WRAP_BODY: body
 
     %{
       "is_ip"     =>  is_ip,
