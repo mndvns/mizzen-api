@@ -12,21 +12,11 @@ defmodule Site.Helper do
 
     quote do
       def unquote(name)(site, base) do
-        # ConCache.get_or_store(unquote(name), site, fn ->
-        IO.inspect BEFORE_WRAP_SITE: site
-        IO.inspect BEFORE_WRAP_BASE: base
-        wrap(site, base, fn(conf) ->
-          if String.contains?(base, "threatweb") do
-            IO.inspect WRAP_CONF: conf
-            # conf.get()
-            conf.get.("", %{"q" => site, "apikey" => "d29b598b-81fd-4628-8ad4-086678ae12cd"}, [])
-            # (unquote(fun)).(site, conf)
-            # IEx.pry(binding, __ENV__, 5000)
-          else
+        ConCache.get_or_store(unquote(name), site, fn ->
+          wrap(site, base, fn(conf) ->
             (unquote(fun)).(site, conf)
-          end
+          end)
         end)
-        # end)
       end
     end
   end
@@ -43,8 +33,8 @@ defmodule Site.Helper do
     quote do
       def unquote(name)(site, base \\ nil) do
         (unquote(fun)).(site)
-        # ConCache.get_or_store(unquote(name), site, fn ->
-        # end)
+        ConCache.get_or_store(unquote(name), site, fn ->
+        end)
       end
     end
   end
@@ -54,6 +44,7 @@ defmodule Site do
   require Transform
   require Floki
   require Request
+  require ExJSON
 
   require IEx
 
@@ -66,11 +57,22 @@ defmodule Site do
   end
 
   defsite threat_web(site, conf) do
-    IO.inspect HERE: [site, conf]
-    IEx.pry
-    %{
-      "foo" => "bar"
-    }
+    twKey = Application.get_env(:api, :threat_web_key)
+    body = conf.get.("", %{"q" => site, "apikey" => twKey}, [])
+    body
+      |> format_threatweb_response()
+  end
+  defp format_threatweb_response(body) do
+    body
+      |> replace_newline
+      |> makeJsonArray
+      |> ExJSON.parse(:to_map)
+  end
+  defp replace_newline(body) do
+    Regex.replace(~r/\n/, body, ",")
+  end
+  defp makeJsonArray(body) do
+    "[" <> body <> "]"
   end
 
   defsite sender_base(site, conf) do
@@ -233,16 +235,15 @@ defmodule Site do
 
     body = func.(map)
 
-    IO.inspect WRAP_SITE: site
-    IO.inspect WRAP_BASE: base
-    IO.inspect WRAP_FUNC: func
-    IO.inspect WRAP_BODY: body
-
+    # IO.inspect WRAP_SITE: site
+    # IO.inspect WRAP_BASE: base
+    # IO.inspect WRAP_FUNC: func
+    # IO.inspect WRAP_BODY: body
 
     %{
-      "is_ip" => is_ip,
-      "is_domain" => is_domain,
-      "body" => body
+      "is_ip"     =>  is_ip,
+      "is_domain" =>  is_domain,
+      "body"      =>  body
     }
   end
 
