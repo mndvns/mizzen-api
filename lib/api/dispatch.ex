@@ -9,4 +9,5 @@ defmodule Api.Dispatch do
   service Site.safe_browsing/2, Site.safe_browsing
   service Site.sender_base/2,   Site.sender_base
   service Site.virus_total/2,   Site.virus_total
+  service Site.threat_web/2,    Site.threat_web
 end
