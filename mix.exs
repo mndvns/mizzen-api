@@ -17,7 +17,8 @@ defmodule Api.Mixfile do
         :logger,
         :poe_api,
         :simple_env,
-        :virus_total],
+        :virus_total,
+        :exjson],
      mod: { Api, [] },]
   end
 
@@ -31,6 +32,7 @@ defmodule Api.Mixfile do
       {:simple_env, github: "camshaft/simple_env" },
       {:sweet_xml, "~> 0.6.1" },
       {:virus_total, "~> 0.0.1"},
+      {:exjson, "~> 0.6.0"}
     ]
   end
 end
