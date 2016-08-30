@@ -1,15 +1,18 @@
 defmodule Api.HTTP do
-  use PoeApi.HTTP
+  require Logger
 
-  get  "/",                    Api.Resource.Root
-  get  "/sites",               Api.Resource.Sites
-  post "/sites",               Api.Resource.Sites.Fetch
+  def start() do
+    listen(Mix.env)
+  end
 
-  get  "/sites/malc0de",       Api.Sites.Malc0de
-  get  "/sites/mc_afee",       Api.Sites.McAfee
-  get  "/sites/rep_auth",      Api.Sites.RepAuth
-  get  "/sites/safe_browsing", Api.Sites.SafeBrowsing
-  get  "/sites/sender_base",   Api.Sites.SenderBase
-  get  "/sites/virus_total",   Api.Sites.VirusTotal
-  get  "/sites/threat_web",    Api.Sites.ThreatWeb
+  def listen(:test) do
+    :noop
+  end
+  def listen(_) do
+    cowboy_opts = [port: Application.get_env(:api, :port), compress: true]
+    wait1_opts = []
+
+    Logger.info "Server listening on port #{cowboy_opts[:port]}"
+    {:ok, _} = Plug.Adapters.Wait1.http(Api.HTTP.Router, wait1_opts, cowboy_opts)
+  end
 end

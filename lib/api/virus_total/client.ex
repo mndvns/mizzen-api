@@ -80,7 +80,7 @@ defmodule Api.VirusTotal.Client do
 
   defp build_url(url, path), do: url <> path
 
-  defp parse_results({:ok, results}), do: {:ok, :jsx.decode(results)}
+  defp parse_results({:ok, results}), do: Poison.decode(results)
   defp parse_results({:error, :not_authenticated}), do: {:error, :not_authenticated}
   defp parse_results({:error, :rate_limited}), do: {:error, :rate_limited}
   defp parse_results({:error, :timeout}), do: {:error, :timeout}
