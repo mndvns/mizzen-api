@@ -7,6 +7,10 @@ config :api,
   virus_total_key: "5e4581b65bb6d42055f3e1924813b498a5f94366ad1267eaf23c7f10eaa07471",
   threat_web_key: "d29b598b-81fd-4628-8ad4-086678ae12cd",
 
+  bauth_username: "mizzenuser",
+  bauth_password: "G134fliJwef9o2jfC823",
+  bauth_realm: "optivmss",
+
   store_response: false,
 
   vendors: %{
