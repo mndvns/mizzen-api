@@ -19,7 +19,8 @@ defmodule Api.Mixfile do
   end
 
   def applications do
-    [:con_cache,
+    [:calendar,
+     :con_cache,
      :cowboy,
      :httpoison,
      :logger,]
@@ -30,7 +31,8 @@ defmodule Api.Mixfile do
   end
 
   def deps do
-    [{:con_cache, "~> 0.11.1"},
+    [{:calendar, "~> 0.16.0"},
+     {:con_cache, "~> 0.11.1"},
      {:concerto, "~> 0.1.2"},
      {:floki, "~> 0.8.0" },
      {:fugue, "~> 0.1.2"},

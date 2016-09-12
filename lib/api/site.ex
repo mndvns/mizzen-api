@@ -58,9 +58,57 @@ defmodule Site do
     conf.get.("", %{"q" => site, "apikey" => @threat_web_key}, [])
     |> String.split("\n")
     |> Stream.map(&Poison.decode!/1)
+    |> format_tw_response()
     |> Enum.to_list()
     |> List.wrap()
   end
+
+  defp format_tw_response(input) do
+
+    props = %{
+      confidence: [],
+      seen: [],
+      sources: %{},
+    }
+    groups = Enum.reduce(input, %{}, fn(item, groups) ->
+      alternative_id = item["alternativeid"]
+      description = item["description"]
+      assessment = item["assessment"] |> String.to_atom()
+      group = %{confidence: confidence_list, seen: seen_list, sources: sources} = groups[assessment] || props
+
+      sources = cond do
+        alternative_id && description ->
+          source = sources[alternative_id] || []
+          Map.put(sources, alternative_id, [description | source] |> Enum.uniq())
+
+          description ->
+            source = sources["None"] || []
+            Map.put(sources, "None", [description | source] |> Enum.uniq())
+
+            true ->
+              sources
+            end
+            confidence = item["confidence"] |> String.to_integer()
+            seen = item["reporttime"] |> Utils.parse_date()
+            group = group
+            |> Map.put(:confidence, [confidence | confidence_list])
+            |> Map.put(:seen, [seen | seen_list])
+            |> Map.put(:sources, sources)
+            groups = Map.put(groups, assessment, group)
+          end)
+
+          Enum.map(groups, fn({assessment, group = %{seen: seen_list, confidence: confidence_list, sources: sources}}) ->
+            %{
+              assessment: assessment,
+              first_seen: seen_list |> Enum.sort() |> hd() |> Utils.format_date(),
+              last_seen: seen_list |> Enum.sort() |> Enum.reverse() |> hd() |> Utils.format_date(),
+              highest_confidence: confidence_list |> Enum.sort() |> Enum.reverse() |> hd(),
+              average_confidence: div(confidence_list |> Enum.reduce(0, &(&1 + &2)), length(confidence_list)),
+              sources: sources |> Enum.map(fn({k, v}) -> {k, Enum.join(v, ", ")} end) |> Enum.into(%{}),
+              record_count: map_size(group),
+            }
+          end)
+        end
 
   defsite sender_base(site, conf) do
     path = conf.resolve_ip_to_site.()
