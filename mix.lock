@@ -1,5 +1,7 @@
-%{"bcrypt": {:git, "https://github.com/opscode/erlang-bcrypt.git", "820283b0d329368f298afd22038340c888689a39", [tag: "0.5.0.3"]},
+%{"basic_auth": {:hex, :basic_auth, "1.0.0", "fc16c423023f4e855d9be3e8a5faa5ca5affc34efff72f75a293362566fc696f", [:mix], [{:cowboy, "~> 1.0", [hex: :cowboy, optional: false]}, {:plug, "~> 0.14 or ~> 1.0", [hex: :plug, optional: false]}]},
+  "bcrypt": {:git, "https://github.com/opscode/erlang-bcrypt.git", "820283b0d329368f298afd22038340c888689a39", [tag: "0.5.0.3"]},
   "bitfield": {:hex, :bitfield, "1.0.0", "52e73c2f8838c078e6279ae302427ec92893083e6f129f68b146fba0ece8e47a", [:mix], []},
+  "calendar": {:hex, :calendar, "0.16.1", "782327ad8bae7c797b887840dc4ddb933f05ce6e333e5b04964d7a5d5f79bde3", [:mix], [{:tzdata, "~> 0.5.8 or ~> 0.1.201603", [hex: :tzdata, optional: false]}]},
   "certifi": {:hex, :certifi, "0.4.0", "a7966efb868b179023618d29a407548f70c52466bf1849b9e8ebd0e34b7ea11f", [:rebar3], []},
   "con_cache": {:hex, :con_cache, "0.11.1", "acbe5a1d10c47faba30d9629c9121e1ef9bca0aa5eddbb86f4e777bd9f9f9b6f", [:mix], [{:exactor, "~> 2.2.0", [hex: :exactor, optional: false]}]},
   "concerto": {:hex, :concerto, "0.1.4", "4c4a0c4208aef8f094035d0cc8c6db3aea32726cdea1a6d41a89b04037339f64", [:mix], []},
@@ -44,5 +46,6 @@
   "simple_secrets": {:hex, :simple_secrets, "1.0.0", "8d3896056171b66c0b87b09240ad650af30ff4d5ef830df74130df1da45e26c8", [:mix], [{:msgpax, "~> 0.8", [hex: :msgpax, optional: false]}, {:pkcs7, "~> 1.0.2", [hex: :pkcs7, optional: false]}]},
   "ssl_verify_fun": {:hex, :ssl_verify_fun, "1.1.0", "edee20847c42e379bf91261db474ffbe373f8acb56e9079acb6038d4e0bf414f", [:rebar, :make], []},
   "sweet_xml": {:hex, :sweet_xml, "0.6.1", "a56f235171f35a32807ce44798dedc748ce249fca574674fecd29c1321cab0de", [:mix], []},
+  "tzdata": {:hex, :tzdata, "0.5.9", "575be217b039057a47e133b72838cbe104fb5329b19906ea4e66857001c37edb", [:mix], [{:hackney, "~> 1.0", [hex: :hackney, optional: false]}]},
   "virus_total": {:hex, :virus_total, "0.0.1", "158ac7c698cf5c0de59a743e0ad12c8592a8dfac664eedcf2a8784ab77063200", [:mix], [{:httpoison, "~> 0.8.0", [hex: :httpoison, optional: false]}, {:jsx, "~> 2.6", [hex: :jsx, optional: false]}]},
   "xml_builder": {:hex, :xml_builder, "0.0.8", "dea10735e15c91e24582e41ee2d3282b7f0177a5b42d6268096a6221ba83226f", [:mix], []}}
