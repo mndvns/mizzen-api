@@ -2,7 +2,7 @@ defmodule Api.Resource.Vendors.Vendor_.GET do
   use Api.Resource
 
   input site
-  param vendor, (String.to_atom(&value))
+  param vendor, &String.to_atom/1
 
   condition site && vendor, :not_found
 
