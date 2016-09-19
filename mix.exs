@@ -42,7 +42,8 @@ defmodule Api.Mixfile do
      {:plug, "~> 0.13.0", override: true},
      {:plug_wait1, "~> 0.1.2"},
      {:poison, "2.2.0", override: true},
-     {:sweet_xml, "~> 0.6.1" },]
+     {:sweet_xml, "~> 0.6.1" },
+     {:basic_auth, "~> 1.0.0"}]
   end
 
   def dev_deps do
