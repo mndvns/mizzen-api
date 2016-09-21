@@ -2,7 +2,6 @@ defmodule Api.Resource do
   defmacro __using__(_opts) do
     quote do
       use Mazurka.Resource
-      alias Plug.Conn
       import unquote(__MODULE__)
     end
   end

@@ -3,15 +3,14 @@ use Mix.Config
 config :api,
   port: (System.get_env("PORT") || "4000") |> String.to_integer(),
 
+  auth_password: "cruisetheseas",
+  auth_token_secret: "8ba6daf2be7c74645f17ec3c825fdb5b89915037d7ef468e0359e19c40680c7c",
+
+  store_response: false,
+
   safe_browsing_key: "ABQIAAAAzO0BeNsWxWi86s2xUZQ1ABTOCj0UZiK_d404jrg3TrlhPfcfBQ",
   virus_total_key: "5e4581b65bb6d42055f3e1924813b498a5f94366ad1267eaf23c7f10eaa07471",
   threat_web_key: "d29b598b-81fd-4628-8ad4-086678ae12cd",
-
-  bauth_username: "mizzenuser",
-  bauth_password: "G134fliJwef9o2jfC823",
-  bauth_realm: "optivmss",
-
-  store_response: false,
 
   vendors: %{
     malc0de: %{
@@ -62,6 +61,7 @@ config :api,
       name: "ThreatWeb",
       display: "Threat Web",
       types: ["ip", "domain", "url"],
-      base: "https://www.threatweb.com/api"
+      base: "https://www.threatweb.com/api",
+      restricted: true
     }
   }

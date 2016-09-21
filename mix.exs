@@ -32,7 +32,6 @@ defmodule Api.Mixfile do
 
   def deps do
     [{:calendar, "~> 0.16.0"},
-     {:basic_auth, "~> 1.0.0"},
      {:con_cache, "~> 0.11.1"},
      {:concerto, "~> 0.1.2"},
      {:floki, "~> 0.8.0" },
@@ -43,6 +42,7 @@ defmodule Api.Mixfile do
      {:plug, "~> 0.13.0", override: true},
      {:plug_wait1, "~> 0.1.2"},
      {:poison, "2.2.0", override: true},
+     {:simple_secrets, "1.0.0"},
      {:sweet_xml, "~> 0.6.1" },]
   end
 

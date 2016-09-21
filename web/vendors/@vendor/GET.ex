@@ -7,14 +7,19 @@ defmodule Api.Resource.Vendors.Vendor_.GET do
   condition site && vendor, :not_found
 
   let conf = vendor |> Api.vendors()
+  let restricted? = conf[:restricted] && !conn().private.authenticated
   let display = conf[:display]
   let base = conf[:base]
-  let body = apply(Site, vendor, [site, base])
 
   hyper do
     action do
-      body
+      if restricted? do
+        error 404
+      else
+        apply(Site, vendor, [site, base])
+        |> Map.put(:name, conf[:name])
+        |> Map.put(:display, conf[:display])
+      end
     end
   end
 end
-
