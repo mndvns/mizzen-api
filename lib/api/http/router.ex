@@ -2,6 +2,7 @@ defmodule Api.HTTP.Router do
   use __MODULE__.Helper
   use Plug.ErrorHandler
 
+  plug Plug.XForwardedProto
   plug Plug.Auth
   plug Plug.Parsers,
     parsers: [Plug.Parsers.Wait1, Plug.Parsers.JSON, Plug.Parsers.URLENCODED],
