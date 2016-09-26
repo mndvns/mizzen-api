@@ -88,7 +88,7 @@ defmodule Site do
             true ->
               sources
             end
-            confidence = item["confidence"] |> String.to_integer()
+            {confidence, _} = item["confidence"] |> Float.parse()
             seen = item["reporttime"] |> Utils.parse_date()
             group = group
             |> Map.put(:confidence, [confidence | confidence_list])
@@ -103,7 +103,7 @@ defmodule Site do
               first_seen: seen_list |> Enum.sort() |> hd() |> Utils.format_date(),
               last_seen: seen_list |> Enum.sort() |> Enum.reverse() |> hd() |> Utils.format_date(),
               highest_confidence: confidence_list |> Enum.sort() |> Enum.reverse() |> hd(),
-              average_confidence: div(confidence_list |> Enum.reduce(0, &(&1 + &2)), length(confidence_list)),
+              average_confidence: ((confidence_list |> Enum.reduce(0, &(&1 + &2))) / length(confidence_list)),
               sources: sources |> Enum.map(fn({k, v}) -> {k, Enum.join(v, ", ")} end) |> Enum.into(%{}),
               record_count: map_size(group),
             }
