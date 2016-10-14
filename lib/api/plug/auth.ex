@@ -1,8 +1,6 @@
 defmodule Plug.Auth do
   @behaviour Plug
-
   @password Application.get_env(:api, :auth_password)
-  @sender Application.get_env(:api, :auth_token_secret) |> SimpleSecrets.init()
 
   def init([]) do
     []
@@ -18,9 +16,11 @@ defmodule Plug.Auth do
   defp parse(conn) do
     user = case Plug.Conn.get_req_header(conn, "authorization") do
       [<<"Bearer ", token :: binary>>] ->
-        decode(token, &SimpleSecrets.unpack(&1, @sender))
+        decode(token, &Secret.unpack/1)
       [<<"Basic ", token :: binary>>] ->
         decode(token, &Base.decode64/1)
+      [token] ->
+        decode(token, &Secret.unpack/1)
       _ -> nil
     end
     conn
