@@ -14,7 +14,7 @@ defmodule Mizzen.Mixfile do
   end
 
   def application do
-    [mod: { Mizzen, []},
+    [mod: {Mizzen, []},
      applications: [
        :cachex,
        :calendar,
@@ -29,7 +29,7 @@ defmodule Mizzen.Mixfile do
   end
 
   defp deps do
-    [{:cachex, "~> 2.0"},
+    [{:cachex, "~> 2.0.0"},
      {:calendar, "~> 0.16.0"},
      {:concerto, "~> 0.1.2"},
      {:concerto_plug, "~> 0.1.0"},
