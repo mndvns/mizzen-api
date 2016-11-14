@@ -1,12 +1,11 @@
-defmodule Api.Resource.Error.GET do
-  use Api.Resource
+defmodule Mizzen.Resource.Error.GET do
+  use Mizzen.Resource
 
-  hyper do
+  mediatype Hyper do
     action do
-      status 404
       %{
         "error" => %{
-          "message" => "Not found"
+          "message" => "Resource not found"
         }
       }
     end

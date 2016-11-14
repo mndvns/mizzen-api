@@ -1,6 +1,6 @@
 defmodule Secret do
-  @password Application.get_env(:api, :auth_password)
-  @sender Application.get_env(:api, :auth_token_secret) |> SimpleSecrets.init()
+  @password Application.get_env(:mizzen, :auth_password)
+  @sender Application.get_env(:mizzen, :auth_token_secret) |> SimpleSecrets.init()
 
   def pack(data) do
     SimpleSecrets.pack(data <> ":" <> @password, @sender)
