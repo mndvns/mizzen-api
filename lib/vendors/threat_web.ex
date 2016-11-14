@@ -9,6 +9,8 @@ defmodule Mizzen.Vendors.ThreatWeb do
 
   def get(site) do
     case HTTPoison.get(@threat_web_url <> URI.encode_query(%{"apikey" => @threat_web_key, "q" => site}), @req_headers, @hackney_opts) do
+      {:ok, %{body: ""}} ->
+        %{error: "no data"}
       {:ok, %{body: body}} ->
         body
         |> String.split("\n")
