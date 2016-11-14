@@ -2,3 +2,5 @@ _build
 deps
 data
 .env
+.iex.exs
+*erl_crash*
