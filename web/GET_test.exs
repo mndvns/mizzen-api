@@ -6,13 +6,26 @@ defmodule Test.Mizzen.Resource.GET do
   after conn ->
     conn
     |> assert_status(200)
-    |> assert_json(%{"greeting" => _})
+    |> Test.Mizzen.Resource.assert_json(%{
+            "href" => "http://www.example.com/",
+            "vendors" => %{
+              "action" => "http://www.example.com/vendors",
+              "method" => "GET",
+              "input" => %{
+                "q" => %{
+                  "required" => true,
+                  "type" => "text",
+                  "value" => nil
+                }
+              }
+            }
+       })
   end
 
   test "should respond with an affordance" do
     affordance()
   after conn ->
     conn
-    |> assert_json(%{"href" => _})
+    |> Test.Mizzen.Resource.assert_json(%{"href" => _})
   end
 end

@@ -8,7 +8,7 @@ defmodule Mizzen.Mixfile do
      deps: deps,
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
-     test_paths: ["web"],
+     test_paths: ["test", "web"],
      elixirc_paths: ["lib", "web"]
    ]
   end
