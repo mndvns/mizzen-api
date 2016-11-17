@@ -19,9 +19,11 @@ defmodule Test.Utils do
 
   test "should format date from unix to iso8601" do
     assert Utils.format_date(1464096368) == "2016-05-24T13:26:08Z"
+    refute Utils.format_date(1464096368) == "2016-XX-24T13:26:08Z"
   end
 
   test "should format date from ios8601 to unix" do
     assert Utils.parse_date("2016-05-24T13:26:08Z") == 1464096368
+    refute Utils.parse_date("2016-05-24T13:26:08Z") == 146409636
   end
 end
