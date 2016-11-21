@@ -1,12 +1,13 @@
 defmodule Plug.Auth do
   @behaviour Plug
-  @password Application.get_env(:api, :auth_password)
+  @password Application.get_env(:mizzen, :auth_password)
+  @id Application.get_env(:mizzen, :auth_id)
 
   def init([]) do
     []
   end
 
-  def call(conn, _) do
+  def call(conn, opts) do
     parse(conn)
   end
 
@@ -29,11 +30,23 @@ defmodule Plug.Auth do
   end
 
   defp decode(token, fun) do
-    with {:ok, decoded} <- apply(fun, [token]),
-         [user, @password] <- String.split(decoded, ":") do
-      user
+    try do
+      apply(fun, [token])
+    rescue
+      exception ->
+        nil
     else
-      _ -> nil
+      decoded when is_binary(decoded) ->
+        case String.split(decoded, ":") do
+          [user, @password] ->
+            true
+          @id ->
+            true
+          _ ->
+            nil
+        end
+      _ ->
+        nil
     end
   end
 end
