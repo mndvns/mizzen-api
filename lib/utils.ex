@@ -1,11 +1,10 @@
 defmodule Utils do
   def ip?(string) do
-    # Regex.match?(~r/^[\d*]\.[\d*]\.[\d*]\.[\d*]$/, string)
     Regex.match?(~r/^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/, string)
   end
 
   def file_hash?(string) do
-    Regex.match?(~r/^[0-9a-fA-F]{32}$/, string)
+    md5?(string) or sha1?(string) or sha256?(string)
   end
 
   def domain?(uri) do
@@ -21,6 +20,18 @@ defmodule Utils do
     head = String.split(head, "-") |> Enum.map(&String.to_integer/1) |> List.to_tuple()
     tail = String.replace(tail, "Z", "") |> String.split(":") |> Enum.map(&String.to_integer/1) |> List.to_tuple()
     seen = {head, tail} |> Calendar.DateTime.from_erl!("GMT") |> DateTime.to_unix()
+  end
+
+  defp md5?(string) do
+    Regex.match?(~r/^[0-9a-fA-F]{32}$/, string)
+  end
+
+  defp sha1?(string) do
+    Regex.match?(~r/^[0-9a-fA-F]{40}$/, string)
+  end
+
+  defp sha256?(string) do
+    Regex.match?(~r/^[0-9a-fA-F]{64}$/, string)
   end
 
 end
