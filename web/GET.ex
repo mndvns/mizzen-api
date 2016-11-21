@@ -1,7 +1,7 @@
-defmodule Api.Resource.GET do
-  use Api.Resource
+defmodule Mizzen.Resource.GET do
+  use Mizzen.Resource
 
-  hyper do
+  mediatype Hyper do
     action do
       %{
         "vendors" => link_to("/vendors")
