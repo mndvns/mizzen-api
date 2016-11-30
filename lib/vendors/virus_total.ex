@@ -15,10 +15,19 @@ defmodule Mizzen.Vendors.VirusTotal do
     file_report(url) |> elem(1)
   end
   def scan(url, {_, _, true}) do
-    domain_report(url) |> elem(1)
+    domain_report(url) |> elem(1) |> parse_whois()
   end
   def scan(url, _) do
     url_scan(url) |> elem(1)
+  end
+
+  defp parse_whois(results) do
+    case Map.has_key?(results, "whois") do
+      true ->
+        Map.update(results, "whois", nil, &(&1 |> String.split(["\n", "   "], trim: true)))
+      false ->
+        results
+    end
   end
 
   defp url_scan(url) do
