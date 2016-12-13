@@ -9,7 +9,11 @@ defmodule Mizzen.Vendors.BlueCoat do
       {:ok, %{body: body}} ->
         categorization = Floki.find(body, "a")
         categories = for e <- categorization, do: elem(e, 2)
-        %{"categories" => List.flatten(categories)}
+        last_reviewed_date = Poison.decode(body) |> elem(1) |> Map.get("ratedate") |> String.split(" <img") |> List.first
+        %{
+          "categories" => List.flatten(categories),
+          "date" => last_reviewed_date
+        }
       _ ->
         %{error: "something went wrong"}
     end
