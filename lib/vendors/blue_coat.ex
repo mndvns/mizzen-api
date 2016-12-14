@@ -14,6 +14,8 @@ defmodule Mizzen.Vendors.BlueCoat do
           "categories" => List.flatten(categories),
           "date" => last_reviewed_date
         }
+      {:error, message} ->
+        message
       _ ->
         %{error: "something went wrong"}
     end
