@@ -11,7 +11,6 @@ defmodule Mizzen.Vendors.Malc0de do
         body
         |> Transform.clean(remove_tags: ["script", "style"], remove_attrs: [~r/^on-/, "href", "style"])
         |> Transform.to_html
-        |> IO.inspect()
         |> Transform.map(fn(x) ->
           x.('//tr[@class="class1"]/td//text()', 'sl')
           |> take([

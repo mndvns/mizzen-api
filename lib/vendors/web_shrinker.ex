@@ -10,6 +10,7 @@ defmodule Mizzen.Vendors.WebShrinker do
       {:ok, %{body: body}} ->
         body
         |> Poison.decode
+        |> elem(1)
       {:error, message} ->
         message
       _ ->
@@ -39,5 +40,15 @@ defmodule Mizzen.Vendors.WebShrinker do
       _ ->
         %{error: "something went wrong"}
     end
+  end
+
+  def get(site) do
+    categories = get_category(site)["data"]
+    screenshot = get_info(site)["data"]
+    list = Enum.concat(categories, screenshot)
+    %{
+      "categories" => List.first(list),
+      "screenshot" => List.last(list)
+    }
   end
 end
