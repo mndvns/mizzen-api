@@ -18,6 +18,8 @@ defmodule Mizzen.Vendors.ThreatWeb do
         |> format_tw_response()
         |> Enum.to_list()
         |> List.wrap()
+      {:error, message} ->
+        message
       _ ->
         %{error: "something went wrong"}
     end

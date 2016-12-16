@@ -24,7 +24,8 @@ defmodule Mizzen.Resource.Vendors.GET do
           link_to("/vendors/rep_auth", nil, q),
           link_to("/vendors/sender_base", nil, q),
           link_to("/vendors/threat_web", nil, q),
-          link_to("/vendors/blue_coat", nil, q)
+          link_to("/vendors/blue_coat", nil, q),
+          link_to("/vendors/web_shrinker", nil, q)
         ]
       }
       |> Map.put("search", link_to("/vendors", nil, q || []))

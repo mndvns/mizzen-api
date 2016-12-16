@@ -38,6 +38,8 @@ defmodule Mizzen.Vendors.RepAuth do
             acc = Map.put(acc, key, value)
           end)
         end)
+      {:error, message} ->
+        message
       _ ->
         %{error: "something went wrong"}
     end

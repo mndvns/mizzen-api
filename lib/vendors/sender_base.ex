@@ -36,7 +36,8 @@ defmodule Mizzen.Vendors.SenderBase do
                         end
             end
           })
-
+      {:error, message} ->
+        message
       _ ->
         %{error: "something went wrong"}
 
