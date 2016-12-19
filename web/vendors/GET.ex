@@ -19,7 +19,7 @@ defmodule Mizzen.Resource.Vendors.GET do
           "is_domain" => domain?,
         },
         "collection" => [
-          link_to("/vendors/virus_total", nil, Keyword.merge(q, meta)),
+          link_to("/vendors/virus_total", nil, q),
           link_to("/vendors/malc0de", nil, q),
           link_to("/vendors/rep_auth", nil, q),
           link_to("/vendors/sender_base", nil, q),
