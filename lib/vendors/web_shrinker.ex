@@ -43,12 +43,9 @@ defmodule Mizzen.Vendors.WebShrinker do
   end
 
   def get(site) do
-    categories = get_category(site)["data"]
-    screenshot = get_info(site)["data"]
-    list = Enum.concat(categories, screenshot)
     %{
-      "categories" => List.first(list),
-      "screenshot" => List.last(list)
+      "categories" => get_category(site),
+      "screenshot" => get_info(site)
     }
   end
 end
