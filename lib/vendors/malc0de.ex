@@ -23,6 +23,8 @@ defmodule Mizzen.Vendors.Malc0de do
             "MD5"
           ])
         end)
+      {:error, message} ->
+        message
       _ ->
         %{error: "something went wrong"}
     end
