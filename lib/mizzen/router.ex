@@ -8,6 +8,9 @@ defmodule Mizzen.Router do
   plug Plug.Auth
 
   plug :match
+
+  plug PlugXForwardedProto
+
   if Mix.env == :dev do
     use Plug.Debugger
     plug Plug.Logger
