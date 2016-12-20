@@ -8,6 +8,9 @@ defmodule Mizzen.Vendors.VirusTotal do
   defdelegate domain_report(url), to: Client
   defdelegate file_report(url), to: Client
 
+  def scan(url) do
+    scan(url, parse_query(url))
+  end
   def scan(url, {true, _, _}) do
     ip_address_report(url) |> elem(1)
   end
@@ -18,7 +21,7 @@ defmodule Mizzen.Vendors.VirusTotal do
     domain_report(url) |> elem(1) |> parse_whois()
   end
   def scan(url, _) do
-    url_scan(url) |> elem(1)
+    url_report(url) |> elem(1)
   end
 
   defp parse_whois(results) do
@@ -28,6 +31,10 @@ defmodule Mizzen.Vendors.VirusTotal do
       false ->
         results
     end
+  end
+
+  def parse_query(query) do
+    {Utils.ip?(query), Utils.file_hash?(query), Utils.domain?(query)}
   end
 
   defp url_scan(url) do
