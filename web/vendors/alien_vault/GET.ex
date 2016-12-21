@@ -1,11 +1,11 @@
 defmodule Mizzen.Resource.Vendors.AlienVault.GET do
   use Mizzen.Resource
 
-  input q
+  input site
 
   mediatype Hyper do
     action do
-      Mizzen.Cache.get(&Mizzen.Vendors.AlienVault.get/1, [q])
+      Mizzen.Cache.get(&Mizzen.Vendors.AlienVault.get/1, [site])
     end
   end
 end
