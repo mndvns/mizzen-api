@@ -5,7 +5,14 @@ defmodule Mizzen.Resource.Vendors.RepAuth.GET do
 
   mediatype Hyper do
     action do
-      Mizzen.Cache.get(&Mizzen.Vendors.RepAuth.get/1, [site])
+      case Utils.parse_query(site) do
+        {true, _, _} ->
+          Mizzen.Cache.get(&Mizzen.Vendors.RepAuth.get/1, [site])
+        {_, _, true} ->
+          Mizzen.Cache.get(&Mizzen.Vendors.RepAuth.get/1, [site])
+        _ ->
+          %{error: "Requested resource does not accept this type of query"}
+      end
     end
   end
 end

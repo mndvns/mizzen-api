@@ -34,4 +34,8 @@ defmodule Utils do
     Regex.match?(~r/^[0-9a-fA-F]{64}$/, string)
   end
 
+  def parse_query(query) do
+    {ip?(query), file_hash?(query), domain?(query)}
+  end
+
 end
