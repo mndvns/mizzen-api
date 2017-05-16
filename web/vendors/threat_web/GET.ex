@@ -13,7 +13,8 @@ defmodule Mizzen.Resource.Vendors.ThreatWeb.GET do
         {false, false, false} ->
           Mizzen.Cache.get(&Mizzen.Vendors.ThreatWeb.get/1, [site])
         {false, true, false} ->
-          %{body: %{error: "Requested resource does not accept this type of query"}}
+          %{body: %{error: "Requested resource does not accept this type of query"},
+           name: "ThreatWeb"}
       end
     end
   end

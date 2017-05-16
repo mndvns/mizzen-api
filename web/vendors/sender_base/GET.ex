@@ -11,7 +11,8 @@ defmodule Mizzen.Resource.Vendors.SenderBase.GET do
         {_, _, true} ->
           Mizzen.Cache.get(&Mizzen.Vendors.SenderBase.get/1, [site])
         _ ->
-          %{body: %{error: "Requested resource does not accept this type of query"}}
+          %{body: %{error: "Requested resource does not accept this type of query"},
+           name: "SenderBase"}
       end
     end
   end
