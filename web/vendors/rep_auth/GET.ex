@@ -11,7 +11,7 @@ defmodule Mizzen.Resource.Vendors.RepAuth.GET do
         {_, _, true} ->
           Mizzen.Cache.get(&Mizzen.Vendors.RepAuth.get/1, [site])
         _ ->
-          %{error: "Requested resource does not accept this type of query"}
+          %{body: %{error: "Requested resource does not accept this type of query"}}
       end
     end
   end
