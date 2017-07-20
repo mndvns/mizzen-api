@@ -26,6 +26,7 @@ defmodule Mizzen.Resource.Vendors.GET do
           link_to("/vendors/threat_web", nil, site),
           link_to("/vendors/blue_coat", nil, site),
           link_to("/vendors/web_shrinker", nil, site),
+          link_to("/vendors/seclytics", nil, site),
           link_to("/vendors/alien_vault", nil, site)
         ]
       }

@@ -22,6 +22,10 @@ defmodule Utils do
     seen = {head, tail} |> Calendar.DateTime.from_erl!("GMT") |> DateTime.to_unix()
   end
 
+  def parse_query(query) do
+    {ip?(query), file_hash?(query), domain?(query)}
+  end
+
   defp md5?(string) do
     Regex.match?(~r/^[0-9a-fA-F]{32}$/, string)
   end
