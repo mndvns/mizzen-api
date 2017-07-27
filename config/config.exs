@@ -14,5 +14,5 @@ config :mizzen,
 
   safe_browsing_key: "ABQIAAAAzO0BeNsWxWi86s2xUZQ1ABTOCj0UZiK_d404jrg3TrlhPfcfBQ",
   virus_total_url: "https://www.threatweb.com/api",
-  virus_total_key: "5e4581b65bb6d42055f3e1924813b498a5f94366ad1267eaf23c7f10eaa07471",
+  virus_total_key: "a71b575b450ac1a14f479e186e2c12880c8ec52762256dff6eb934e035491afa",
   threat_web_key: "d29b598b-81fd-4628-8ad4-086678ae12cd"
